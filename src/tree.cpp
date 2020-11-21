@@ -8,7 +8,9 @@ void TreeNode::addSibling(TreeNode* sibling){
 }
 
 TreeNode::TreeNode(int lineno, NodeType type) {
-	
+	this->lineo = lineno;
+    this->NodeType = type;
+    
 }
 
 void TreeNode::genNodeId() {

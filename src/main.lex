@@ -14,7 +14,6 @@ WHILTESPACE [[:blank:]]
 DEC_CONST   [1-9][0-9]*
 OCT_CONST   0[0-7]*
 HEX_CONST   (0X|0x)[0-9a-fA-F]*
-INTEGER ([1-9][0-9]*)|(0[0-7]*)|((0x|0X)([0-9A-Fa-f]*))
 
 CHAR \'.?\'
 STRING \".+\"
@@ -33,6 +32,7 @@ IDENTIFIER [[:alpha:]_][[:alpha:][:digit:]_]*
 
 "if"	return IF;
 "else"	return ELSE;
+"for"   return FOR;
 "while"	return WHILE;
 "break" return BREAK;
 "continue"  return CONTINUE;

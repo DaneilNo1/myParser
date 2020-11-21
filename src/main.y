@@ -12,7 +12,7 @@
 
 %token SEMICOLON
 
-%token IDENTIFIER INTEGER CHAR BOOL STRING
+%token IDENTIFIER INTEGER CHAR BOOL STRING VOID
 
 %left LOP_EQ
 
@@ -45,7 +45,7 @@ declaration
     node->stype = STMT_DECL;
     node->addChild($1);
     node->addChild($2);
-    $$ = node;   
+    $$ = node;
 }
 ;
 
@@ -67,6 +67,7 @@ expr
 T: T_INT {$$ = new TreeNode(lineno, NODE_TYPE); $$->type = TYPE_INT;}
 | T_CHAR {$$ = new TreeNode(lineno, NODE_TYPE); $$->type = TYPE_CHAR;}
 | T_BOOL {$$ = new TreeNode(lineno, NODE_TYPE); $$->type = TYPE_BOOL;}
+| T_VOID {$$ = new TreeNode(lineno, NODE_TYPE); $$->type = TYPE_VOID;}
 ;
 
 %%

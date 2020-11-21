@@ -4,6 +4,8 @@
 #include "pch.h"
 #include "type.h"
 
+#define MAXCHILDREN 5
+
 enum NodeType
 {
     NODE_CONST, 
@@ -30,7 +32,7 @@ struct TreeNode {
 public:
     int nodeID;  // 用于作业的序号输出
     int lineno;
-    NodeType nodeType;
+    NodeType nodeType; 
 
     TreeNode* child = nullptr;
     TreeNode* sibling = nullptr;
