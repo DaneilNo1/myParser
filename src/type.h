@@ -5,6 +5,7 @@ using namespace std;
 
 enum ValueType
 {
+    VALUE_VOID,
     VALUE_BOOL,
     VALUE_INT,
     VALUE_CHAR,

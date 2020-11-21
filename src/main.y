@@ -8,7 +8,7 @@
 %}
 %token T_CHAR T_INT T_STRING T_BOOL 
 
-%token LOP_ASSIGN 
+%token LOP_ASSIGN
 
 %token SEMICOLON
 
@@ -38,7 +38,7 @@ declaration
     node->addChild($1);
     node->addChild($2);
     node->addChild($4);
-    $$ = node;   
+    $$ = node;
 } 
 | T IDENTIFIER {
     TreeNode* node = new TreeNode($1->lineno, NODE_STMT);
@@ -64,7 +64,7 @@ expr
 }
 ;
 
-T: T_INT {$$ = new TreeNode(lineno, NODE_TYPE); $$->type = TYPE_INT;} 
+T: T_INT {$$ = new TreeNode(lineno, NODE_TYPE); $$->type = TYPE_INT;}
 | T_CHAR {$$ = new TreeNode(lineno, NODE_TYPE); $$->type = TYPE_CHAR;}
 | T_BOOL {$$ = new TreeNode(lineno, NODE_TYPE); $$->type = TYPE_BOOL;}
 ;
