@@ -22,7 +22,11 @@
 CompUnit
 : Decl 
 | FuncDef
+| CompUnit Decl
+| CompUnit FuncDef
 ;
+
+
 
 Decl
 : ConstDecl
@@ -30,7 +34,7 @@ Decl
 ;
 
 ConstDecl
-: CONST BType ConstDef SEMICOLON
+: CONST BType ConstDefs SEMICOLON
 ;
 
 BType
@@ -39,18 +43,43 @@ BType
 | T_STRING
 ;
 
+ConstDefs
+: ConstDef
+| ConstDefs COMMA ConstDef
+;
+
 ConstDef
-: IDENTIFIER LOP_ASSIGN ConstInitVal
+: IDENTIFIER ArrayIndexs LOP_ASSIGN ConstInitVal
+;
+
+ArrayIndexs
+: ArrayIndexs ArrayIndex
+|
+;
+
+ArrayIndex
+: LS_LBRA ConstExp LS_RBRA
+;
+
+ConstInitVals
+: ConstInitVal
+| ConstInitVals COMMA ConstInitVal
 ;
 
 ConstInitVal
 : ConstExp
 | LBRACE RBRACE
+| LBRACE ConstInitVals RBRACE
 ;
 
 
 VarDecl
-: BType VarDef SEMICOLON
+: BType VarDefs SEMICOLON
+;
+
+VarDefs
+: VarDef ArrayIndexs
+| VarDefs ArrayIndexs COMMA VarDef
 ;
 
 VarDef
@@ -58,13 +87,20 @@ VarDef
 | IDENTIFIER LOP_ASSIGN InitVal
 ;
 
+InitVals
+: InitVal
+| InitVals COMMA InitVal
+;
+
 InitVal
 : Exp
 | LBRACE RBRACE
+| LBRACE InitVals RBRACE
 ;
 
 FuncDef
 : FuncType IDENTIFIER LPAREN RPAREN Block
+| FuncType IDENTIFIER LPAREN FuncFParams RPAREN Block
 ;
 
 FuncType
@@ -76,14 +112,30 @@ FuncType
 
 FuncFParams
 : FuncFParam
+| FuncFParams COMMA FuncFParam
 ;
 
 FuncFParam
 : BType IDENTIFIER
 ;
 
+MultipuleIndexs
+: LS_LBRA LS_RBRA
+| LS_LBRA LS_RBRA DynamicIndex
+;
+
+DynamicIndex
+: LS_LBRA Exp LS_RBRA
+| DynamicIndex LS_LBRA Exp LS_RBRA
+;
+
 Block
-: LBRACE RBRACE
+: LBRACE BlockItems RBRACE
+;
+
+BlockItems
+: BlockItems BlockItem
+|
 ;
 
 BlockItem
@@ -94,12 +146,15 @@ BlockItem
 Stmt
 : LVal LOP_ASSIGN Exp SEMICOLON
 | SEMICOLON
+| Exp SEMICOLON
 | Block
 | IF LPAREN Cond RPAREN Stmt
+| IF LPAREN Cond RPAREN Stmt ELSE Stmt
 | WHILE LPAREN Cond RPAREN Stmt
 | BREAK SEMICOLON
 | CONTINUE SEMICOLON
 | RETURN SEMICOLON
+| RETURN Exp SEMICOLON
 ;
 
 Exp
@@ -111,7 +166,7 @@ Cond
 ;
 
 LVal
-: IDENTIFIER 
+: IDENTIFIER DynamicIndex
 ;
 
 PrimaryExp
@@ -129,6 +184,7 @@ Number
 UnaryExp
 : PrimaryExp 
 | IDENTIFIER LPAREN RPAREN
+| IDENTIFIER LPAREN FuncFParams RPAREN
 | UnaryOp UnaryExp
 ;
 
@@ -140,6 +196,7 @@ UnaryOp
 
 FuncRParams
 : Exp
+| FuncFParams COMMA Exp
 ;
 
 MulExp
