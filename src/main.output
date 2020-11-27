@@ -1,0 +1,2340 @@
+终端机在文法中未使用
+
+    T_BOOL
+    LOP_ADDTO
+    LOP_MINTO
+    LOP_MULTO
+    LOP_DIVTO
+    CHAR
+    BOOL
+    STRING
+    VOID
+    FOR
+    TRUE
+    FALSE
+    BITAND
+    BITOR
+    BITNOT
+    SHL
+    SHR
+    LOP_EQ
+
+
+由于冲突，解析器中的规则不起作用
+
+   34 FuncType: T_INT
+   35         | T_CHAR
+   36         | T_STRING
+
+
+状态 1 冲突：1 项归约/归约
+状态 2 冲突：1 项归约/归约
+状态 3 冲突：1 项归约/归约
+状态 30 冲突：1 项偏移/归约
+状态 62 冲突：1 项偏移/归约
+状态 159 冲突：1 项偏移/归约
+
+
+语法
+
+    0 $accept: CompUnit $end
+
+    1 CompUnit: Decl
+    2         | FuncDef
+    3         | CompUnit Decl
+    4         | CompUnit FuncDef
+
+    5 Decl: ConstDecl
+    6     | VarDecl
+
+    7 ConstDecl: CONST BType ConstDefs SEMICOLON
+
+    8 BType: T_INT
+    9      | T_CHAR
+   10      | T_STRING
+
+   11 ConstDefs: ConstDef
+   12          | ConstDefs COMMA ConstDef
+
+   13 ConstDef: IDENTIFIER ArrayIndexs LOP_ASSIGN ConstInitVal
+
+   14 ArrayIndexs: ArrayIndexs ArrayIndex
+   15            | %empty
+
+   16 ArrayIndex: LS_LBRA ConstExp LS_RBRA
+
+   17 ConstInitVals: ConstInitVal
+   18              | ConstInitVals COMMA ConstInitVal
+
+   19 ConstInitVal: ConstExp
+   20             | LBRACE RBRACE
+   21             | LBRACE ConstInitVals RBRACE
+
+   22 VarDecl: BType VarDefs SEMICOLON
+
+   23 VarDefs: VarDef ArrayIndexs
+   24        | VarDefs ArrayIndexs COMMA VarDef
+
+   25 VarDef: IDENTIFIER
+   26       | IDENTIFIER LOP_ASSIGN InitVal
+
+   27 InitVals: InitVal
+   28         | InitVals COMMA InitVal
+
+   29 InitVal: Exp
+   30        | LBRACE RBRACE
+   31        | LBRACE InitVals RBRACE
+
+   32 FuncDef: FuncType IDENTIFIER LPAREN RPAREN Block
+   33        | FuncType IDENTIFIER LPAREN FuncFParams RPAREN Block
+
+   34 FuncType: T_INT
+   35         | T_CHAR
+   36         | T_STRING
+   37         | T_VOID
+
+   38 FuncFParams: FuncFParam
+   39            | FuncFParams COMMA FuncFParam
+
+   40 FuncFParam: BType IDENTIFIER
+   41           | BType IDENTIFIER MultipuleIndexs
+
+   42 MultipuleIndexs: LS_LBRA LS_RBRA
+   43                | LS_LBRA LS_RBRA DynamicIndex
+
+   44 DynamicIndex: LS_LBRA Exp LS_RBRA
+   45             | DynamicIndex LS_LBRA Exp LS_RBRA
+
+   46 Block: LBRACE BlockItems RBRACE
+
+   47 BlockItems: BlockItems BlockItem
+   48           | %empty
+
+   49 BlockItem: Decl
+   50          | Stmt
+
+   51 Stmt: LVal LOP_ASSIGN Exp SEMICOLON
+   52     | SEMICOLON
+   53     | Exp SEMICOLON
+   54     | Block
+   55     | IF LPAREN Cond RPAREN Stmt
+   56     | IF LPAREN Cond RPAREN Stmt ELSE Stmt
+   57     | WHILE LPAREN Cond RPAREN Stmt
+   58     | BREAK SEMICOLON
+   59     | CONTINUE SEMICOLON
+   60     | RETURN SEMICOLON
+   61     | RETURN Exp SEMICOLON
+
+   62 Exp: AddExp
+
+   63 Cond: LOrExp
+
+   64 LVal: IDENTIFIER DynamicIndex
+
+   65 PrimaryExp: LPAREN Exp RPAREN
+   66           | LVal
+   67           | Number
+
+   68 Number: INTEGER
+
+   69 UnaryExp: PrimaryExp
+   70         | IDENTIFIER LPAREN RPAREN
+   71         | IDENTIFIER LPAREN FuncRParams RPAREN
+   72         | UnaryOp UnaryExp
+
+   73 UnaryOp: ADD
+   74        | MINUS
+   75        | NOT
+
+   76 FuncRParams: Exp
+   77            | FuncRParams COMMA Exp
+
+   78 MulExp: UnaryExp
+   79       | MulExp MUL UnaryExp
+   80       | MulExp DIV UnaryExp
+   81       | MulExp MOD UnaryExp
+
+   82 AddExp: MulExp
+   83       | AddExp ADD MulExp
+   84       | AddExp MINUS MulExp
+
+   85 RelExp: AddExp
+   86       | RelExp LS AddExp
+   87       | RelExp GT AddExp
+   88       | RelExp LE AddExp
+   89       | RelExp GE AddExp
+
+   90 EqExp: RelExp
+   91      | EqExp EQ RelExp
+   92      | EqExp NE RelExp
+
+   93 LAndExp: EqExp
+   94        | LAndExp AND EqExp
+
+   95 LOrExp: LAndExp
+   96       | LOrExp OR LAndExp
+
+   97 ConstExp: AddExp
+
+
+终结语词，附有它们出现处的规则
+
+    $end (0) 0
+    error (256)
+    T_CHAR (258) 9 35
+    T_INT (259) 8 34
+    T_STRING (260) 10 36
+    T_BOOL (261)
+    T_VOID (262) 37
+    LOP_ASSIGN (263) 13 26 51
+    LOP_ADDTO (264)
+    LOP_MINTO (265)
+    LOP_MULTO (266)
+    LOP_DIVTO (267)
+    SEMICOLON (268) 7 22 51 52 53 58 59 60 61
+    IDENTIFIER (269) 13 25 26 32 33 40 41 64 70 71
+    INTEGER (270) 68
+    CHAR (271)
+    BOOL (272)
+    STRING (273)
+    VOID (274)
+    CONST (275) 7
+    IF (276) 55 56
+    ELSE (277) 56
+    FOR (278)
+    WHILE (279) 57
+    BREAK (280) 58
+    CONTINUE (281) 59
+    RETURN (282) 60 61
+    TRUE (283)
+    FALSE (284)
+    LPAREN (285) 32 33 55 56 57 65 70 71
+    RPAREN (286) 32 33 55 56 57 65 70 71
+    LBRACE (287) 20 21 30 31 46
+    RBRACE (288) 20 21 30 31 46
+    LS_LBRA (289) 16 42 43 44 45
+    LS_RBRA (290) 16 42 43 44 45
+    ADD (291) 73 83
+    MINUS (292) 74 84
+    MUL (293) 79
+    DIV (294) 80
+    MOD (295) 81
+    NOT (296) 75
+    AND (297) 94
+    OR (298) 96
+    BITAND (299)
+    BITOR (300)
+    BITNOT (301)
+    SHL (302)
+    SHR (303)
+    LS (304) 86
+    GT (305) 87
+    EQ (306) 91
+    LE (307) 88
+    GE (308) 89
+    NE (309) 92
+    COMMA (310) 12 18 24 28 39 77
+    LOP_EQ (311)
+
+
+非终结语词，附有它们出现处的规则
+
+    $accept (57)
+        on left: 0
+    CompUnit (58)
+        on left: 1 2 3 4
+        on right: 0 3 4
+    Decl (59)
+        on left: 5 6
+        on right: 1 3 49
+    ConstDecl (60)
+        on left: 7
+        on right: 5
+    BType (61)
+        on left: 8 9 10
+        on right: 7 22 40 41
+    ConstDefs (62)
+        on left: 11 12
+        on right: 7 12
+    ConstDef (63)
+        on left: 13
+        on right: 11 12
+    ArrayIndexs (64)
+        on left: 14 15
+        on right: 13 14 23 24
+    ArrayIndex (65)
+        on left: 16
+        on right: 14
+    ConstInitVals (66)
+        on left: 17 18
+        on right: 18 21
+    ConstInitVal (67)
+        on left: 19 20 21
+        on right: 13 17 18
+    VarDecl (68)
+        on left: 22
+        on right: 6
+    VarDefs (69)
+        on left: 23 24
+        on right: 22 24
+    VarDef (70)
+        on left: 25 26
+        on right: 23 24
+    InitVals (71)
+        on left: 27 28
+        on right: 28 31
+    InitVal (72)
+        on left: 29 30 31
+        on right: 26 27 28
+    FuncDef (73)
+        on left: 32 33
+        on right: 2 4
+    FuncType (74)
+        on left: 34 35 36 37
+        on right: 32 33
+    FuncFParams (75)
+        on left: 38 39
+        on right: 33 39
+    FuncFParam (76)
+        on left: 40 41
+        on right: 38 39
+    MultipuleIndexs (77)
+        on left: 42 43
+        on right: 41
+    DynamicIndex (78)
+        on left: 44 45
+        on right: 43 45 64
+    Block (79)
+        on left: 46
+        on right: 32 33 54
+    BlockItems (80)
+        on left: 47 48
+        on right: 46 47
+    BlockItem (81)
+        on left: 49 50
+        on right: 47
+    Stmt (82)
+        on left: 51 52 53 54 55 56 57 58 59 60 61
+        on right: 50 55 56 57
+    Exp (83)
+        on left: 62
+        on right: 29 44 45 51 53 61 65 76 77
+    Cond (84)
+        on left: 63
+        on right: 55 56 57
+    LVal (85)
+        on left: 64
+        on right: 51 66
+    PrimaryExp (86)
+        on left: 65 66 67
+        on right: 69
+    Number (87)
+        on left: 68
+        on right: 67
+    UnaryExp (88)
+        on left: 69 70 71 72
+        on right: 72 78 79 80 81
+    UnaryOp (89)
+        on left: 73 74 75
+        on right: 72
+    FuncRParams (90)
+        on left: 76 77
+        on right: 71 77
+    MulExp (91)
+        on left: 78 79 80 81
+        on right: 79 80 81 82 83 84
+    AddExp (92)
+        on left: 82 83 84
+        on right: 62 83 84 85 86 87 88 89 97
+    RelExp (93)
+        on left: 85 86 87 88 89
+        on right: 86 87 88 89 90 91 92
+    EqExp (94)
+        on left: 90 91 92
+        on right: 91 92 93 94
+    LAndExp (95)
+        on left: 93 94
+        on right: 94 95 96
+    LOrExp (96)
+        on left: 95 96
+        on right: 63 96
+    ConstExp (97)
+        on left: 97
+        on right: 16 19
+
+
+状态 0
+
+    0 $accept: . CompUnit $end
+
+    T_CHAR    偏移，并进入状态 1
+    T_INT     偏移，并进入状态 2
+    T_STRING  偏移，并进入状态 3
+    T_VOID    偏移，并进入状态 4
+    CONST     偏移，并进入状态 5
+
+    CompUnit   转到状态 6
+    Decl       转到状态 7
+    ConstDecl  转到状态 8
+    BType      转到状态 9
+    VarDecl    转到状态 10
+    FuncDef    转到状态 11
+    FuncType   转到状态 12
+
+
+状态 1
+
+    9 BType: T_CHAR .
+   35 FuncType: T_CHAR .
+
+    IDENTIFIER  使用规则 9 以归约 (BType)
+    IDENTIFIER  [使用规则 35 以归约 (FuncType)]
+    $default    使用规则 9 以归约 (BType)
+
+
+状态 2
+
+    8 BType: T_INT .
+   34 FuncType: T_INT .
+
+    IDENTIFIER  使用规则 8 以归约 (BType)
+    IDENTIFIER  [使用规则 34 以归约 (FuncType)]
+    $default    使用规则 8 以归约 (BType)
+
+
+状态 3
+
+   10 BType: T_STRING .
+   36 FuncType: T_STRING .
+
+    IDENTIFIER  使用规则 10 以归约 (BType)
+    IDENTIFIER  [使用规则 36 以归约 (FuncType)]
+    $default    使用规则 10 以归约 (BType)
+
+
+状态 4
+
+   37 FuncType: T_VOID .
+
+    $default  使用规则 37 以归约 (FuncType)
+
+
+状态 5
+
+    7 ConstDecl: CONST . BType ConstDefs SEMICOLON
+
+    T_CHAR    偏移，并进入状态 13
+    T_INT     偏移，并进入状态 14
+    T_STRING  偏移，并进入状态 15
+
+    BType  转到状态 16
+
+
+状态 6
+
+    0 $accept: CompUnit . $end
+    3 CompUnit: CompUnit . Decl
+    4         | CompUnit . FuncDef
+
+    $end      偏移，并进入状态 17
+    T_CHAR    偏移，并进入状态 1
+    T_INT     偏移，并进入状态 2
+    T_STRING  偏移，并进入状态 3
+    T_VOID    偏移，并进入状态 4
+    CONST     偏移，并进入状态 5
+
+    Decl       转到状态 18
+    ConstDecl  转到状态 8
+    BType      转到状态 9
+    VarDecl    转到状态 10
+    FuncDef    转到状态 19
+    FuncType   转到状态 12
+
+
+状态 7
+
+    1 CompUnit: Decl .
+
+    $default  使用规则 1 以归约 (CompUnit)
+
+
+状态 8
+
+    5 Decl: ConstDecl .
+
+    $default  使用规则 5 以归约 (Decl)
+
+
+状态 9
+
+   22 VarDecl: BType . VarDefs SEMICOLON
+
+    IDENTIFIER  偏移，并进入状态 20
+
+    VarDefs  转到状态 21
+    VarDef   转到状态 22
+
+
+状态 10
+
+    6 Decl: VarDecl .
+
+    $default  使用规则 6 以归约 (Decl)
+
+
+状态 11
+
+    2 CompUnit: FuncDef .
+
+    $default  使用规则 2 以归约 (CompUnit)
+
+
+状态 12
+
+   32 FuncDef: FuncType . IDENTIFIER LPAREN RPAREN Block
+   33        | FuncType . IDENTIFIER LPAREN FuncFParams RPAREN Block
+
+    IDENTIFIER  偏移，并进入状态 23
+
+
+状态 13
+
+    9 BType: T_CHAR .
+
+    $default  使用规则 9 以归约 (BType)
+
+
+状态 14
+
+    8 BType: T_INT .
+
+    $default  使用规则 8 以归约 (BType)
+
+
+状态 15
+
+   10 BType: T_STRING .
+
+    $default  使用规则 10 以归约 (BType)
+
+
+状态 16
+
+    7 ConstDecl: CONST BType . ConstDefs SEMICOLON
+
+    IDENTIFIER  偏移，并进入状态 24
+
+    ConstDefs  转到状态 25
+    ConstDef   转到状态 26
+
+
+状态 17
+
+    0 $accept: CompUnit $end .
+
+    $default  接受
+
+
+状态 18
+
+    3 CompUnit: CompUnit Decl .
+
+    $default  使用规则 3 以归约 (CompUnit)
+
+
+状态 19
+
+    4 CompUnit: CompUnit FuncDef .
+
+    $default  使用规则 4 以归约 (CompUnit)
+
+
+状态 20
+
+   25 VarDef: IDENTIFIER .
+   26       | IDENTIFIER . LOP_ASSIGN InitVal
+
+    LOP_ASSIGN  偏移，并进入状态 27
+
+    $default  使用规则 25 以归约 (VarDef)
+
+
+状态 21
+
+   22 VarDecl: BType VarDefs . SEMICOLON
+   24 VarDefs: VarDefs . ArrayIndexs COMMA VarDef
+
+    SEMICOLON  偏移，并进入状态 28
+
+    $default  使用规则 15 以归约 (ArrayIndexs)
+
+    ArrayIndexs  转到状态 29
+
+
+状态 22
+
+   23 VarDefs: VarDef . ArrayIndexs
+
+    $default  使用规则 15 以归约 (ArrayIndexs)
+
+    ArrayIndexs  转到状态 30
+
+
+状态 23
+
+   32 FuncDef: FuncType IDENTIFIER . LPAREN RPAREN Block
+   33        | FuncType IDENTIFIER . LPAREN FuncFParams RPAREN Block
+
+    LPAREN  偏移，并进入状态 31
+
+
+状态 24
+
+   13 ConstDef: IDENTIFIER . ArrayIndexs LOP_ASSIGN ConstInitVal
+
+    $default  使用规则 15 以归约 (ArrayIndexs)
+
+    ArrayIndexs  转到状态 32
+
+
+状态 25
+
+    7 ConstDecl: CONST BType ConstDefs . SEMICOLON
+   12 ConstDefs: ConstDefs . COMMA ConstDef
+
+    SEMICOLON  偏移，并进入状态 33
+    COMMA      偏移，并进入状态 34
+
+
+状态 26
+
+   11 ConstDefs: ConstDef .
+
+    $default  使用规则 11 以归约 (ConstDefs)
+
+
+状态 27
+
+   26 VarDef: IDENTIFIER LOP_ASSIGN . InitVal
+
+    IDENTIFIER  偏移，并进入状态 35
+    INTEGER     偏移，并进入状态 36
+    LPAREN      偏移，并进入状态 37
+    LBRACE      偏移，并进入状态 38
+    ADD         偏移，并进入状态 39
+    MINUS       偏移，并进入状态 40
+    NOT         偏移，并进入状态 41
+
+    InitVal     转到状态 42
+    Exp         转到状态 43
+    LVal        转到状态 44
+    PrimaryExp  转到状态 45
+    Number      转到状态 46
+    UnaryExp    转到状态 47
+    UnaryOp     转到状态 48
+    MulExp      转到状态 49
+    AddExp      转到状态 50
+
+
+状态 28
+
+   22 VarDecl: BType VarDefs SEMICOLON .
+
+    $default  使用规则 22 以归约 (VarDecl)
+
+
+状态 29
+
+   14 ArrayIndexs: ArrayIndexs . ArrayIndex
+   24 VarDefs: VarDefs ArrayIndexs . COMMA VarDef
+
+    LS_LBRA  偏移，并进入状态 51
+    COMMA    偏移，并进入状态 52
+
+    ArrayIndex  转到状态 53
+
+
+状态 30
+
+   14 ArrayIndexs: ArrayIndexs . ArrayIndex
+   23 VarDefs: VarDef ArrayIndexs .
+
+    LS_LBRA  偏移，并进入状态 51
+
+    LS_LBRA   [使用规则 23 以归约 (VarDefs)]
+    $default  使用规则 23 以归约 (VarDefs)
+
+    ArrayIndex  转到状态 53
+
+
+状态 31
+
+   32 FuncDef: FuncType IDENTIFIER LPAREN . RPAREN Block
+   33        | FuncType IDENTIFIER LPAREN . FuncFParams RPAREN Block
+
+    T_CHAR    偏移，并进入状态 13
+    T_INT     偏移，并进入状态 14
+    T_STRING  偏移，并进入状态 15
+    RPAREN    偏移，并进入状态 54
+
+    BType        转到状态 55
+    FuncFParams  转到状态 56
+    FuncFParam   转到状态 57
+
+
+状态 32
+
+   13 ConstDef: IDENTIFIER ArrayIndexs . LOP_ASSIGN ConstInitVal
+   14 ArrayIndexs: ArrayIndexs . ArrayIndex
+
+    LOP_ASSIGN  偏移，并进入状态 58
+    LS_LBRA     偏移，并进入状态 51
+
+    ArrayIndex  转到状态 53
+
+
+状态 33
+
+    7 ConstDecl: CONST BType ConstDefs SEMICOLON .
+
+    $default  使用规则 7 以归约 (ConstDecl)
+
+
+状态 34
+
+   12 ConstDefs: ConstDefs COMMA . ConstDef
+
+    IDENTIFIER  偏移，并进入状态 24
+
+    ConstDef  转到状态 59
+
+
+状态 35
+
+   64 LVal: IDENTIFIER . DynamicIndex
+   70 UnaryExp: IDENTIFIER . LPAREN RPAREN
+   71         | IDENTIFIER . LPAREN FuncRParams RPAREN
+
+    LPAREN   偏移，并进入状态 60
+    LS_LBRA  偏移，并进入状态 61
+
+    DynamicIndex  转到状态 62
+
+
+状态 36
+
+   68 Number: INTEGER .
+
+    $default  使用规则 68 以归约 (Number)
+
+
+状态 37
+
+   65 PrimaryExp: LPAREN . Exp RPAREN
+
+    IDENTIFIER  偏移，并进入状态 35
+    INTEGER     偏移，并进入状态 36
+    LPAREN      偏移，并进入状态 37
+    ADD         偏移，并进入状态 39
+    MINUS       偏移，并进入状态 40
+    NOT         偏移，并进入状态 41
+
+    Exp         转到状态 63
+    LVal        转到状态 44
+    PrimaryExp  转到状态 45
+    Number      转到状态 46
+    UnaryExp    转到状态 47
+    UnaryOp     转到状态 48
+    MulExp      转到状态 49
+    AddExp      转到状态 50
+
+
+状态 38
+
+   30 InitVal: LBRACE . RBRACE
+   31        | LBRACE . InitVals RBRACE
+
+    IDENTIFIER  偏移，并进入状态 35
+    INTEGER     偏移，并进入状态 36
+    LPAREN      偏移，并进入状态 37
+    LBRACE      偏移，并进入状态 38
+    RBRACE      偏移，并进入状态 64
+    ADD         偏移，并进入状态 39
+    MINUS       偏移，并进入状态 40
+    NOT         偏移，并进入状态 41
+
+    InitVals    转到状态 65
+    InitVal     转到状态 66
+    Exp         转到状态 43
+    LVal        转到状态 44
+    PrimaryExp  转到状态 45
+    Number      转到状态 46
+    UnaryExp    转到状态 47
+    UnaryOp     转到状态 48
+    MulExp      转到状态 49
+    AddExp      转到状态 50
+
+
+状态 39
+
+   73 UnaryOp: ADD .
+
+    $default  使用规则 73 以归约 (UnaryOp)
+
+
+状态 40
+
+   74 UnaryOp: MINUS .
+
+    $default  使用规则 74 以归约 (UnaryOp)
+
+
+状态 41
+
+   75 UnaryOp: NOT .
+
+    $default  使用规则 75 以归约 (UnaryOp)
+
+
+状态 42
+
+   26 VarDef: IDENTIFIER LOP_ASSIGN InitVal .
+
+    $default  使用规则 26 以归约 (VarDef)
+
+
+状态 43
+
+   29 InitVal: Exp .
+
+    $default  使用规则 29 以归约 (InitVal)
+
+
+状态 44
+
+   66 PrimaryExp: LVal .
+
+    $default  使用规则 66 以归约 (PrimaryExp)
+
+
+状态 45
+
+   69 UnaryExp: PrimaryExp .
+
+    $default  使用规则 69 以归约 (UnaryExp)
+
+
+状态 46
+
+   67 PrimaryExp: Number .
+
+    $default  使用规则 67 以归约 (PrimaryExp)
+
+
+状态 47
+
+   78 MulExp: UnaryExp .
+
+    $default  使用规则 78 以归约 (MulExp)
+
+
+状态 48
+
+   72 UnaryExp: UnaryOp . UnaryExp
+
+    IDENTIFIER  偏移，并进入状态 35
+    INTEGER     偏移，并进入状态 36
+    LPAREN      偏移，并进入状态 37
+    ADD         偏移，并进入状态 39
+    MINUS       偏移，并进入状态 40
+    NOT         偏移，并进入状态 41
+
+    LVal        转到状态 44
+    PrimaryExp  转到状态 45
+    Number      转到状态 46
+    UnaryExp    转到状态 67
+    UnaryOp     转到状态 48
+
+
+状态 49
+
+   79 MulExp: MulExp . MUL UnaryExp
+   80       | MulExp . DIV UnaryExp
+   81       | MulExp . MOD UnaryExp
+   82 AddExp: MulExp .
+
+    MUL  偏移，并进入状态 68
+    DIV  偏移，并进入状态 69
+    MOD  偏移，并进入状态 70
+
+    $default  使用规则 82 以归约 (AddExp)
+
+
+状态 50
+
+   62 Exp: AddExp .
+   83 AddExp: AddExp . ADD MulExp
+   84       | AddExp . MINUS MulExp
+
+    ADD    偏移，并进入状态 71
+    MINUS  偏移，并进入状态 72
+
+    $default  使用规则 62 以归约 (Exp)
+
+
+状态 51
+
+   16 ArrayIndex: LS_LBRA . ConstExp LS_RBRA
+
+    IDENTIFIER  偏移，并进入状态 35
+    INTEGER     偏移，并进入状态 36
+    LPAREN      偏移，并进入状态 37
+    ADD         偏移，并进入状态 39
+    MINUS       偏移，并进入状态 40
+    NOT         偏移，并进入状态 41
+
+    LVal        转到状态 44
+    PrimaryExp  转到状态 45
+    Number      转到状态 46
+    UnaryExp    转到状态 47
+    UnaryOp     转到状态 48
+    MulExp      转到状态 49
+    AddExp      转到状态 73
+    ConstExp    转到状态 74
+
+
+状态 52
+
+   24 VarDefs: VarDefs ArrayIndexs COMMA . VarDef
+
+    IDENTIFIER  偏移，并进入状态 20
+
+    VarDef  转到状态 75
+
+
+状态 53
+
+   14 ArrayIndexs: ArrayIndexs ArrayIndex .
+
+    $default  使用规则 14 以归约 (ArrayIndexs)
+
+
+状态 54
+
+   32 FuncDef: FuncType IDENTIFIER LPAREN RPAREN . Block
+
+    LBRACE  偏移，并进入状态 76
+
+    Block  转到状态 77
+
+
+状态 55
+
+   40 FuncFParam: BType . IDENTIFIER
+   41           | BType . IDENTIFIER MultipuleIndexs
+
+    IDENTIFIER  偏移，并进入状态 78
+
+
+状态 56
+
+   33 FuncDef: FuncType IDENTIFIER LPAREN FuncFParams . RPAREN Block
+   39 FuncFParams: FuncFParams . COMMA FuncFParam
+
+    RPAREN  偏移，并进入状态 79
+    COMMA   偏移，并进入状态 80
+
+
+状态 57
+
+   38 FuncFParams: FuncFParam .
+
+    $default  使用规则 38 以归约 (FuncFParams)
+
+
+状态 58
+
+   13 ConstDef: IDENTIFIER ArrayIndexs LOP_ASSIGN . ConstInitVal
+
+    IDENTIFIER  偏移，并进入状态 35
+    INTEGER     偏移，并进入状态 36
+    LPAREN      偏移，并进入状态 37
+    LBRACE      偏移，并进入状态 81
+    ADD         偏移，并进入状态 39
+    MINUS       偏移，并进入状态 40
+    NOT         偏移，并进入状态 41
+
+    ConstInitVal  转到状态 82
+    LVal          转到状态 44
+    PrimaryExp    转到状态 45
+    Number        转到状态 46
+    UnaryExp      转到状态 47
+    UnaryOp       转到状态 48
+    MulExp        转到状态 49
+    AddExp        转到状态 73
+    ConstExp      转到状态 83
+
+
+状态 59
+
+   12 ConstDefs: ConstDefs COMMA ConstDef .
+
+    $default  使用规则 12 以归约 (ConstDefs)
+
+
+状态 60
+
+   70 UnaryExp: IDENTIFIER LPAREN . RPAREN
+   71         | IDENTIFIER LPAREN . FuncRParams RPAREN
+
+    IDENTIFIER  偏移，并进入状态 35
+    INTEGER     偏移，并进入状态 36
+    LPAREN      偏移，并进入状态 37
+    RPAREN      偏移，并进入状态 84
+    ADD         偏移，并进入状态 39
+    MINUS       偏移，并进入状态 40
+    NOT         偏移，并进入状态 41
+
+    Exp          转到状态 85
+    LVal         转到状态 44
+    PrimaryExp   转到状态 45
+    Number       转到状态 46
+    UnaryExp     转到状态 47
+    UnaryOp      转到状态 48
+    FuncRParams  转到状态 86
+    MulExp       转到状态 49
+    AddExp       转到状态 50
+
+
+状态 61
+
+   44 DynamicIndex: LS_LBRA . Exp LS_RBRA
+
+    IDENTIFIER  偏移，并进入状态 35
+    INTEGER     偏移，并进入状态 36
+    LPAREN      偏移，并进入状态 37
+    ADD         偏移，并进入状态 39
+    MINUS       偏移，并进入状态 40
+    NOT         偏移，并进入状态 41
+
+    Exp         转到状态 87
+    LVal        转到状态 44
+    PrimaryExp  转到状态 45
+    Number      转到状态 46
+    UnaryExp    转到状态 47
+    UnaryOp     转到状态 48
+    MulExp      转到状态 49
+    AddExp      转到状态 50
+
+
+状态 62
+
+   45 DynamicIndex: DynamicIndex . LS_LBRA Exp LS_RBRA
+   64 LVal: IDENTIFIER DynamicIndex .
+
+    LS_LBRA  偏移，并进入状态 88
+
+    LS_LBRA   [使用规则 64 以归约 (LVal)]
+    $default  使用规则 64 以归约 (LVal)
+
+
+状态 63
+
+   65 PrimaryExp: LPAREN Exp . RPAREN
+
+    RPAREN  偏移，并进入状态 89
+
+
+状态 64
+
+   30 InitVal: LBRACE RBRACE .
+
+    $default  使用规则 30 以归约 (InitVal)
+
+
+状态 65
+
+   28 InitVals: InitVals . COMMA InitVal
+   31 InitVal: LBRACE InitVals . RBRACE
+
+    RBRACE  偏移，并进入状态 90
+    COMMA   偏移，并进入状态 91
+
+
+状态 66
+
+   27 InitVals: InitVal .
+
+    $default  使用规则 27 以归约 (InitVals)
+
+
+状态 67
+
+   72 UnaryExp: UnaryOp UnaryExp .
+
+    $default  使用规则 72 以归约 (UnaryExp)
+
+
+状态 68
+
+   79 MulExp: MulExp MUL . UnaryExp
+
+    IDENTIFIER  偏移，并进入状态 35
+    INTEGER     偏移，并进入状态 36
+    LPAREN      偏移，并进入状态 37
+    ADD         偏移，并进入状态 39
+    MINUS       偏移，并进入状态 40
+    NOT         偏移，并进入状态 41
+
+    LVal        转到状态 44
+    PrimaryExp  转到状态 45
+    Number      转到状态 46
+    UnaryExp    转到状态 92
+    UnaryOp     转到状态 48
+
+
+状态 69
+
+   80 MulExp: MulExp DIV . UnaryExp
+
+    IDENTIFIER  偏移，并进入状态 35
+    INTEGER     偏移，并进入状态 36
+    LPAREN      偏移，并进入状态 37
+    ADD         偏移，并进入状态 39
+    MINUS       偏移，并进入状态 40
+    NOT         偏移，并进入状态 41
+
+    LVal        转到状态 44
+    PrimaryExp  转到状态 45
+    Number      转到状态 46
+    UnaryExp    转到状态 93
+    UnaryOp     转到状态 48
+
+
+状态 70
+
+   81 MulExp: MulExp MOD . UnaryExp
+
+    IDENTIFIER  偏移，并进入状态 35
+    INTEGER     偏移，并进入状态 36
+    LPAREN      偏移，并进入状态 37
+    ADD         偏移，并进入状态 39
+    MINUS       偏移，并进入状态 40
+    NOT         偏移，并进入状态 41
+
+    LVal        转到状态 44
+    PrimaryExp  转到状态 45
+    Number      转到状态 46
+    UnaryExp    转到状态 94
+    UnaryOp     转到状态 48
+
+
+状态 71
+
+   83 AddExp: AddExp ADD . MulExp
+
+    IDENTIFIER  偏移，并进入状态 35
+    INTEGER     偏移，并进入状态 36
+    LPAREN      偏移，并进入状态 37
+    ADD         偏移，并进入状态 39
+    MINUS       偏移，并进入状态 40
+    NOT         偏移，并进入状态 41
+
+    LVal        转到状态 44
+    PrimaryExp  转到状态 45
+    Number      转到状态 46
+    UnaryExp    转到状态 47
+    UnaryOp     转到状态 48
+    MulExp      转到状态 95
+
+
+状态 72
+
+   84 AddExp: AddExp MINUS . MulExp
+
+    IDENTIFIER  偏移，并进入状态 35
+    INTEGER     偏移，并进入状态 36
+    LPAREN      偏移，并进入状态 37
+    ADD         偏移，并进入状态 39
+    MINUS       偏移，并进入状态 40
+    NOT         偏移，并进入状态 41
+
+    LVal        转到状态 44
+    PrimaryExp  转到状态 45
+    Number      转到状态 46
+    UnaryExp    转到状态 47
+    UnaryOp     转到状态 48
+    MulExp      转到状态 96
+
+
+状态 73
+
+   83 AddExp: AddExp . ADD MulExp
+   84       | AddExp . MINUS MulExp
+   97 ConstExp: AddExp .
+
+    ADD    偏移，并进入状态 71
+    MINUS  偏移，并进入状态 72
+
+    $default  使用规则 97 以归约 (ConstExp)
+
+
+状态 74
+
+   16 ArrayIndex: LS_LBRA ConstExp . LS_RBRA
+
+    LS_RBRA  偏移，并进入状态 97
+
+
+状态 75
+
+   24 VarDefs: VarDefs ArrayIndexs COMMA VarDef .
+
+    $default  使用规则 24 以归约 (VarDefs)
+
+
+状态 76
+
+   46 Block: LBRACE . BlockItems RBRACE
+
+    $default  使用规则 48 以归约 (BlockItems)
+
+    BlockItems  转到状态 98
+
+
+状态 77
+
+   32 FuncDef: FuncType IDENTIFIER LPAREN RPAREN Block .
+
+    $default  使用规则 32 以归约 (FuncDef)
+
+
+状态 78
+
+   40 FuncFParam: BType IDENTIFIER .
+   41           | BType IDENTIFIER . MultipuleIndexs
+
+    LS_LBRA  偏移，并进入状态 99
+
+    $default  使用规则 40 以归约 (FuncFParam)
+
+    MultipuleIndexs  转到状态 100
+
+
+状态 79
+
+   33 FuncDef: FuncType IDENTIFIER LPAREN FuncFParams RPAREN . Block
+
+    LBRACE  偏移，并进入状态 76
+
+    Block  转到状态 101
+
+
+状态 80
+
+   39 FuncFParams: FuncFParams COMMA . FuncFParam
+
+    T_CHAR    偏移，并进入状态 13
+    T_INT     偏移，并进入状态 14
+    T_STRING  偏移，并进入状态 15
+
+    BType       转到状态 55
+    FuncFParam  转到状态 102
+
+
+状态 81
+
+   20 ConstInitVal: LBRACE . RBRACE
+   21             | LBRACE . ConstInitVals RBRACE
+
+    IDENTIFIER  偏移，并进入状态 35
+    INTEGER     偏移，并进入状态 36
+    LPAREN      偏移，并进入状态 37
+    LBRACE      偏移，并进入状态 81
+    RBRACE      偏移，并进入状态 103
+    ADD         偏移，并进入状态 39
+    MINUS       偏移，并进入状态 40
+    NOT         偏移，并进入状态 41
+
+    ConstInitVals  转到状态 104
+    ConstInitVal   转到状态 105
+    LVal           转到状态 44
+    PrimaryExp     转到状态 45
+    Number         转到状态 46
+    UnaryExp       转到状态 47
+    UnaryOp        转到状态 48
+    MulExp         转到状态 49
+    AddExp         转到状态 73
+    ConstExp       转到状态 83
+
+
+状态 82
+
+   13 ConstDef: IDENTIFIER ArrayIndexs LOP_ASSIGN ConstInitVal .
+
+    $default  使用规则 13 以归约 (ConstDef)
+
+
+状态 83
+
+   19 ConstInitVal: ConstExp .
+
+    $default  使用规则 19 以归约 (ConstInitVal)
+
+
+状态 84
+
+   70 UnaryExp: IDENTIFIER LPAREN RPAREN .
+
+    $default  使用规则 70 以归约 (UnaryExp)
+
+
+状态 85
+
+   76 FuncRParams: Exp .
+
+    $default  使用规则 76 以归约 (FuncRParams)
+
+
+状态 86
+
+   71 UnaryExp: IDENTIFIER LPAREN FuncRParams . RPAREN
+   77 FuncRParams: FuncRParams . COMMA Exp
+
+    RPAREN  偏移，并进入状态 106
+    COMMA   偏移，并进入状态 107
+
+
+状态 87
+
+   44 DynamicIndex: LS_LBRA Exp . LS_RBRA
+
+    LS_RBRA  偏移，并进入状态 108
+
+
+状态 88
+
+   45 DynamicIndex: DynamicIndex LS_LBRA . Exp LS_RBRA
+
+    IDENTIFIER  偏移，并进入状态 35
+    INTEGER     偏移，并进入状态 36
+    LPAREN      偏移，并进入状态 37
+    ADD         偏移，并进入状态 39
+    MINUS       偏移，并进入状态 40
+    NOT         偏移，并进入状态 41
+
+    Exp         转到状态 109
+    LVal        转到状态 44
+    PrimaryExp  转到状态 45
+    Number      转到状态 46
+    UnaryExp    转到状态 47
+    UnaryOp     转到状态 48
+    MulExp      转到状态 49
+    AddExp      转到状态 50
+
+
+状态 89
+
+   65 PrimaryExp: LPAREN Exp RPAREN .
+
+    $default  使用规则 65 以归约 (PrimaryExp)
+
+
+状态 90
+
+   31 InitVal: LBRACE InitVals RBRACE .
+
+    $default  使用规则 31 以归约 (InitVal)
+
+
+状态 91
+
+   28 InitVals: InitVals COMMA . InitVal
+
+    IDENTIFIER  偏移，并进入状态 35
+    INTEGER     偏移，并进入状态 36
+    LPAREN      偏移，并进入状态 37
+    LBRACE      偏移，并进入状态 38
+    ADD         偏移，并进入状态 39
+    MINUS       偏移，并进入状态 40
+    NOT         偏移，并进入状态 41
+
+    InitVal     转到状态 110
+    Exp         转到状态 43
+    LVal        转到状态 44
+    PrimaryExp  转到状态 45
+    Number      转到状态 46
+    UnaryExp    转到状态 47
+    UnaryOp     转到状态 48
+    MulExp      转到状态 49
+    AddExp      转到状态 50
+
+
+状态 92
+
+   79 MulExp: MulExp MUL UnaryExp .
+
+    $default  使用规则 79 以归约 (MulExp)
+
+
+状态 93
+
+   80 MulExp: MulExp DIV UnaryExp .
+
+    $default  使用规则 80 以归约 (MulExp)
+
+
+状态 94
+
+   81 MulExp: MulExp MOD UnaryExp .
+
+    $default  使用规则 81 以归约 (MulExp)
+
+
+状态 95
+
+   79 MulExp: MulExp . MUL UnaryExp
+   80       | MulExp . DIV UnaryExp
+   81       | MulExp . MOD UnaryExp
+   83 AddExp: AddExp ADD MulExp .
+
+    MUL  偏移，并进入状态 68
+    DIV  偏移，并进入状态 69
+    MOD  偏移，并进入状态 70
+
+    $default  使用规则 83 以归约 (AddExp)
+
+
+状态 96
+
+   79 MulExp: MulExp . MUL UnaryExp
+   80       | MulExp . DIV UnaryExp
+   81       | MulExp . MOD UnaryExp
+   84 AddExp: AddExp MINUS MulExp .
+
+    MUL  偏移，并进入状态 68
+    DIV  偏移，并进入状态 69
+    MOD  偏移，并进入状态 70
+
+    $default  使用规则 84 以归约 (AddExp)
+
+
+状态 97
+
+   16 ArrayIndex: LS_LBRA ConstExp LS_RBRA .
+
+    $default  使用规则 16 以归约 (ArrayIndex)
+
+
+状态 98
+
+   46 Block: LBRACE BlockItems . RBRACE
+   47 BlockItems: BlockItems . BlockItem
+
+    T_CHAR      偏移，并进入状态 13
+    T_INT       偏移，并进入状态 14
+    T_STRING    偏移，并进入状态 15
+    SEMICOLON   偏移，并进入状态 111
+    IDENTIFIER  偏移，并进入状态 35
+    INTEGER     偏移，并进入状态 36
+    CONST       偏移，并进入状态 5
+    IF          偏移，并进入状态 112
+    WHILE       偏移，并进入状态 113
+    BREAK       偏移，并进入状态 114
+    CONTINUE    偏移，并进入状态 115
+    RETURN      偏移，并进入状态 116
+    LPAREN      偏移，并进入状态 37
+    LBRACE      偏移，并进入状态 76
+    RBRACE      偏移，并进入状态 117
+    ADD         偏移，并进入状态 39
+    MINUS       偏移，并进入状态 40
+    NOT         偏移，并进入状态 41
+
+    Decl        转到状态 118
+    ConstDecl   转到状态 8
+    BType       转到状态 9
+    VarDecl     转到状态 10
+    Block       转到状态 119
+    BlockItem   转到状态 120
+    Stmt        转到状态 121
+    Exp         转到状态 122
+    LVal        转到状态 123
+    PrimaryExp  转到状态 45
+    Number      转到状态 46
+    UnaryExp    转到状态 47
+    UnaryOp     转到状态 48
+    MulExp      转到状态 49
+    AddExp      转到状态 50
+
+
+状态 99
+
+   42 MultipuleIndexs: LS_LBRA . LS_RBRA
+   43                | LS_LBRA . LS_RBRA DynamicIndex
+
+    LS_RBRA  偏移，并进入状态 124
+
+
+状态 100
+
+   41 FuncFParam: BType IDENTIFIER MultipuleIndexs .
+
+    $default  使用规则 41 以归约 (FuncFParam)
+
+
+状态 101
+
+   33 FuncDef: FuncType IDENTIFIER LPAREN FuncFParams RPAREN Block .
+
+    $default  使用规则 33 以归约 (FuncDef)
+
+
+状态 102
+
+   39 FuncFParams: FuncFParams COMMA FuncFParam .
+
+    $default  使用规则 39 以归约 (FuncFParams)
+
+
+状态 103
+
+   20 ConstInitVal: LBRACE RBRACE .
+
+    $default  使用规则 20 以归约 (ConstInitVal)
+
+
+状态 104
+
+   18 ConstInitVals: ConstInitVals . COMMA ConstInitVal
+   21 ConstInitVal: LBRACE ConstInitVals . RBRACE
+
+    RBRACE  偏移，并进入状态 125
+    COMMA   偏移，并进入状态 126
+
+
+状态 105
+
+   17 ConstInitVals: ConstInitVal .
+
+    $default  使用规则 17 以归约 (ConstInitVals)
+
+
+状态 106
+
+   71 UnaryExp: IDENTIFIER LPAREN FuncRParams RPAREN .
+
+    $default  使用规则 71 以归约 (UnaryExp)
+
+
+状态 107
+
+   77 FuncRParams: FuncRParams COMMA . Exp
+
+    IDENTIFIER  偏移，并进入状态 35
+    INTEGER     偏移，并进入状态 36
+    LPAREN      偏移，并进入状态 37
+    ADD         偏移，并进入状态 39
+    MINUS       偏移，并进入状态 40
+    NOT         偏移，并进入状态 41
+
+    Exp         转到状态 127
+    LVal        转到状态 44
+    PrimaryExp  转到状态 45
+    Number      转到状态 46
+    UnaryExp    转到状态 47
+    UnaryOp     转到状态 48
+    MulExp      转到状态 49
+    AddExp      转到状态 50
+
+
+状态 108
+
+   44 DynamicIndex: LS_LBRA Exp LS_RBRA .
+
+    $default  使用规则 44 以归约 (DynamicIndex)
+
+
+状态 109
+
+   45 DynamicIndex: DynamicIndex LS_LBRA Exp . LS_RBRA
+
+    LS_RBRA  偏移，并进入状态 128
+
+
+状态 110
+
+   28 InitVals: InitVals COMMA InitVal .
+
+    $default  使用规则 28 以归约 (InitVals)
+
+
+状态 111
+
+   52 Stmt: SEMICOLON .
+
+    $default  使用规则 52 以归约 (Stmt)
+
+
+状态 112
+
+   55 Stmt: IF . LPAREN Cond RPAREN Stmt
+   56     | IF . LPAREN Cond RPAREN Stmt ELSE Stmt
+
+    LPAREN  偏移，并进入状态 129
+
+
+状态 113
+
+   57 Stmt: WHILE . LPAREN Cond RPAREN Stmt
+
+    LPAREN  偏移，并进入状态 130
+
+
+状态 114
+
+   58 Stmt: BREAK . SEMICOLON
+
+    SEMICOLON  偏移，并进入状态 131
+
+
+状态 115
+
+   59 Stmt: CONTINUE . SEMICOLON
+
+    SEMICOLON  偏移，并进入状态 132
+
+
+状态 116
+
+   60 Stmt: RETURN . SEMICOLON
+   61     | RETURN . Exp SEMICOLON
+
+    SEMICOLON   偏移，并进入状态 133
+    IDENTIFIER  偏移，并进入状态 35
+    INTEGER     偏移，并进入状态 36
+    LPAREN      偏移，并进入状态 37
+    ADD         偏移，并进入状态 39
+    MINUS       偏移，并进入状态 40
+    NOT         偏移，并进入状态 41
+
+    Exp         转到状态 134
+    LVal        转到状态 44
+    PrimaryExp  转到状态 45
+    Number      转到状态 46
+    UnaryExp    转到状态 47
+    UnaryOp     转到状态 48
+    MulExp      转到状态 49
+    AddExp      转到状态 50
+
+
+状态 117
+
+   46 Block: LBRACE BlockItems RBRACE .
+
+    $default  使用规则 46 以归约 (Block)
+
+
+状态 118
+
+   49 BlockItem: Decl .
+
+    $default  使用规则 49 以归约 (BlockItem)
+
+
+状态 119
+
+   54 Stmt: Block .
+
+    $default  使用规则 54 以归约 (Stmt)
+
+
+状态 120
+
+   47 BlockItems: BlockItems BlockItem .
+
+    $default  使用规则 47 以归约 (BlockItems)
+
+
+状态 121
+
+   50 BlockItem: Stmt .
+
+    $default  使用规则 50 以归约 (BlockItem)
+
+
+状态 122
+
+   53 Stmt: Exp . SEMICOLON
+
+    SEMICOLON  偏移，并进入状态 135
+
+
+状态 123
+
+   51 Stmt: LVal . LOP_ASSIGN Exp SEMICOLON
+   66 PrimaryExp: LVal .
+
+    LOP_ASSIGN  偏移，并进入状态 136
+
+    $default  使用规则 66 以归约 (PrimaryExp)
+
+
+状态 124
+
+   42 MultipuleIndexs: LS_LBRA LS_RBRA .
+   43                | LS_LBRA LS_RBRA . DynamicIndex
+
+    LS_LBRA  偏移，并进入状态 61
+
+    $default  使用规则 42 以归约 (MultipuleIndexs)
+
+    DynamicIndex  转到状态 137
+
+
+状态 125
+
+   21 ConstInitVal: LBRACE ConstInitVals RBRACE .
+
+    $default  使用规则 21 以归约 (ConstInitVal)
+
+
+状态 126
+
+   18 ConstInitVals: ConstInitVals COMMA . ConstInitVal
+
+    IDENTIFIER  偏移，并进入状态 35
+    INTEGER     偏移，并进入状态 36
+    LPAREN      偏移，并进入状态 37
+    LBRACE      偏移，并进入状态 81
+    ADD         偏移，并进入状态 39
+    MINUS       偏移，并进入状态 40
+    NOT         偏移，并进入状态 41
+
+    ConstInitVal  转到状态 138
+    LVal          转到状态 44
+    PrimaryExp    转到状态 45
+    Number        转到状态 46
+    UnaryExp      转到状态 47
+    UnaryOp       转到状态 48
+    MulExp        转到状态 49
+    AddExp        转到状态 73
+    ConstExp      转到状态 83
+
+
+状态 127
+
+   77 FuncRParams: FuncRParams COMMA Exp .
+
+    $default  使用规则 77 以归约 (FuncRParams)
+
+
+状态 128
+
+   45 DynamicIndex: DynamicIndex LS_LBRA Exp LS_RBRA .
+
+    $default  使用规则 45 以归约 (DynamicIndex)
+
+
+状态 129
+
+   55 Stmt: IF LPAREN . Cond RPAREN Stmt
+   56     | IF LPAREN . Cond RPAREN Stmt ELSE Stmt
+
+    IDENTIFIER  偏移，并进入状态 35
+    INTEGER     偏移，并进入状态 36
+    LPAREN      偏移，并进入状态 37
+    ADD         偏移，并进入状态 39
+    MINUS       偏移，并进入状态 40
+    NOT         偏移，并进入状态 41
+
+    Cond        转到状态 139
+    LVal        转到状态 44
+    PrimaryExp  转到状态 45
+    Number      转到状态 46
+    UnaryExp    转到状态 47
+    UnaryOp     转到状态 48
+    MulExp      转到状态 49
+    AddExp      转到状态 140
+    RelExp      转到状态 141
+    EqExp       转到状态 142
+    LAndExp     转到状态 143
+    LOrExp      转到状态 144
+
+
+状态 130
+
+   57 Stmt: WHILE LPAREN . Cond RPAREN Stmt
+
+    IDENTIFIER  偏移，并进入状态 35
+    INTEGER     偏移，并进入状态 36
+    LPAREN      偏移，并进入状态 37
+    ADD         偏移，并进入状态 39
+    MINUS       偏移，并进入状态 40
+    NOT         偏移，并进入状态 41
+
+    Cond        转到状态 145
+    LVal        转到状态 44
+    PrimaryExp  转到状态 45
+    Number      转到状态 46
+    UnaryExp    转到状态 47
+    UnaryOp     转到状态 48
+    MulExp      转到状态 49
+    AddExp      转到状态 140
+    RelExp      转到状态 141
+    EqExp       转到状态 142
+    LAndExp     转到状态 143
+    LOrExp      转到状态 144
+
+
+状态 131
+
+   58 Stmt: BREAK SEMICOLON .
+
+    $default  使用规则 58 以归约 (Stmt)
+
+
+状态 132
+
+   59 Stmt: CONTINUE SEMICOLON .
+
+    $default  使用规则 59 以归约 (Stmt)
+
+
+状态 133
+
+   60 Stmt: RETURN SEMICOLON .
+
+    $default  使用规则 60 以归约 (Stmt)
+
+
+状态 134
+
+   61 Stmt: RETURN Exp . SEMICOLON
+
+    SEMICOLON  偏移，并进入状态 146
+
+
+状态 135
+
+   53 Stmt: Exp SEMICOLON .
+
+    $default  使用规则 53 以归约 (Stmt)
+
+
+状态 136
+
+   51 Stmt: LVal LOP_ASSIGN . Exp SEMICOLON
+
+    IDENTIFIER  偏移，并进入状态 35
+    INTEGER     偏移，并进入状态 36
+    LPAREN      偏移，并进入状态 37
+    ADD         偏移，并进入状态 39
+    MINUS       偏移，并进入状态 40
+    NOT         偏移，并进入状态 41
+
+    Exp         转到状态 147
+    LVal        转到状态 44
+    PrimaryExp  转到状态 45
+    Number      转到状态 46
+    UnaryExp    转到状态 47
+    UnaryOp     转到状态 48
+    MulExp      转到状态 49
+    AddExp      转到状态 50
+
+
+状态 137
+
+   43 MultipuleIndexs: LS_LBRA LS_RBRA DynamicIndex .
+   45 DynamicIndex: DynamicIndex . LS_LBRA Exp LS_RBRA
+
+    LS_LBRA  偏移，并进入状态 88
+
+    $default  使用规则 43 以归约 (MultipuleIndexs)
+
+
+状态 138
+
+   18 ConstInitVals: ConstInitVals COMMA ConstInitVal .
+
+    $default  使用规则 18 以归约 (ConstInitVals)
+
+
+状态 139
+
+   55 Stmt: IF LPAREN Cond . RPAREN Stmt
+   56     | IF LPAREN Cond . RPAREN Stmt ELSE Stmt
+
+    RPAREN  偏移，并进入状态 148
+
+
+状态 140
+
+   83 AddExp: AddExp . ADD MulExp
+   84       | AddExp . MINUS MulExp
+   85 RelExp: AddExp .
+
+    ADD    偏移，并进入状态 71
+    MINUS  偏移，并进入状态 72
+
+    $default  使用规则 85 以归约 (RelExp)
+
+
+状态 141
+
+   86 RelExp: RelExp . LS AddExp
+   87       | RelExp . GT AddExp
+   88       | RelExp . LE AddExp
+   89       | RelExp . GE AddExp
+   90 EqExp: RelExp .
+
+    LS  偏移，并进入状态 149
+    GT  偏移，并进入状态 150
+    LE  偏移，并进入状态 151
+    GE  偏移，并进入状态 152
+
+    $default  使用规则 90 以归约 (EqExp)
+
+
+状态 142
+
+   91 EqExp: EqExp . EQ RelExp
+   92      | EqExp . NE RelExp
+   93 LAndExp: EqExp .
+
+    EQ  偏移，并进入状态 153
+    NE  偏移，并进入状态 154
+
+    $default  使用规则 93 以归约 (LAndExp)
+
+
+状态 143
+
+   94 LAndExp: LAndExp . AND EqExp
+   95 LOrExp: LAndExp .
+
+    AND  偏移，并进入状态 155
+
+    $default  使用规则 95 以归约 (LOrExp)
+
+
+状态 144
+
+   63 Cond: LOrExp .
+   96 LOrExp: LOrExp . OR LAndExp
+
+    OR  偏移，并进入状态 156
+
+    $default  使用规则 63 以归约 (Cond)
+
+
+状态 145
+
+   57 Stmt: WHILE LPAREN Cond . RPAREN Stmt
+
+    RPAREN  偏移，并进入状态 157
+
+
+状态 146
+
+   61 Stmt: RETURN Exp SEMICOLON .
+
+    $default  使用规则 61 以归约 (Stmt)
+
+
+状态 147
+
+   51 Stmt: LVal LOP_ASSIGN Exp . SEMICOLON
+
+    SEMICOLON  偏移，并进入状态 158
+
+
+状态 148
+
+   55 Stmt: IF LPAREN Cond RPAREN . Stmt
+   56     | IF LPAREN Cond RPAREN . Stmt ELSE Stmt
+
+    SEMICOLON   偏移，并进入状态 111
+    IDENTIFIER  偏移，并进入状态 35
+    INTEGER     偏移，并进入状态 36
+    IF          偏移，并进入状态 112
+    WHILE       偏移，并进入状态 113
+    BREAK       偏移，并进入状态 114
+    CONTINUE    偏移，并进入状态 115
+    RETURN      偏移，并进入状态 116
+    LPAREN      偏移，并进入状态 37
+    LBRACE      偏移，并进入状态 76
+    ADD         偏移，并进入状态 39
+    MINUS       偏移，并进入状态 40
+    NOT         偏移，并进入状态 41
+
+    Block       转到状态 119
+    Stmt        转到状态 159
+    Exp         转到状态 122
+    LVal        转到状态 123
+    PrimaryExp  转到状态 45
+    Number      转到状态 46
+    UnaryExp    转到状态 47
+    UnaryOp     转到状态 48
+    MulExp      转到状态 49
+    AddExp      转到状态 50
+
+
+状态 149
+
+   86 RelExp: RelExp LS . AddExp
+
+    IDENTIFIER  偏移，并进入状态 35
+    INTEGER     偏移，并进入状态 36
+    LPAREN      偏移，并进入状态 37
+    ADD         偏移，并进入状态 39
+    MINUS       偏移，并进入状态 40
+    NOT         偏移，并进入状态 41
+
+    LVal        转到状态 44
+    PrimaryExp  转到状态 45
+    Number      转到状态 46
+    UnaryExp    转到状态 47
+    UnaryOp     转到状态 48
+    MulExp      转到状态 49
+    AddExp      转到状态 160
+
+
+状态 150
+
+   87 RelExp: RelExp GT . AddExp
+
+    IDENTIFIER  偏移，并进入状态 35
+    INTEGER     偏移，并进入状态 36
+    LPAREN      偏移，并进入状态 37
+    ADD         偏移，并进入状态 39
+    MINUS       偏移，并进入状态 40
+    NOT         偏移，并进入状态 41
+
+    LVal        转到状态 44
+    PrimaryExp  转到状态 45
+    Number      转到状态 46
+    UnaryExp    转到状态 47
+    UnaryOp     转到状态 48
+    MulExp      转到状态 49
+    AddExp      转到状态 161
+
+
+状态 151
+
+   88 RelExp: RelExp LE . AddExp
+
+    IDENTIFIER  偏移，并进入状态 35
+    INTEGER     偏移，并进入状态 36
+    LPAREN      偏移，并进入状态 37
+    ADD         偏移，并进入状态 39
+    MINUS       偏移，并进入状态 40
+    NOT         偏移，并进入状态 41
+
+    LVal        转到状态 44
+    PrimaryExp  转到状态 45
+    Number      转到状态 46
+    UnaryExp    转到状态 47
+    UnaryOp     转到状态 48
+    MulExp      转到状态 49
+    AddExp      转到状态 162
+
+
+状态 152
+
+   89 RelExp: RelExp GE . AddExp
+
+    IDENTIFIER  偏移，并进入状态 35
+    INTEGER     偏移，并进入状态 36
+    LPAREN      偏移，并进入状态 37
+    ADD         偏移，并进入状态 39
+    MINUS       偏移，并进入状态 40
+    NOT         偏移，并进入状态 41
+
+    LVal        转到状态 44
+    PrimaryExp  转到状态 45
+    Number      转到状态 46
+    UnaryExp    转到状态 47
+    UnaryOp     转到状态 48
+    MulExp      转到状态 49
+    AddExp      转到状态 163
+
+
+状态 153
+
+   91 EqExp: EqExp EQ . RelExp
+
+    IDENTIFIER  偏移，并进入状态 35
+    INTEGER     偏移，并进入状态 36
+    LPAREN      偏移，并进入状态 37
+    ADD         偏移，并进入状态 39
+    MINUS       偏移，并进入状态 40
+    NOT         偏移，并进入状态 41
+
+    LVal        转到状态 44
+    PrimaryExp  转到状态 45
+    Number      转到状态 46
+    UnaryExp    转到状态 47
+    UnaryOp     转到状态 48
+    MulExp      转到状态 49
+    AddExp      转到状态 140
+    RelExp      转到状态 164
+
+
+状态 154
+
+   92 EqExp: EqExp NE . RelExp
+
+    IDENTIFIER  偏移，并进入状态 35
+    INTEGER     偏移，并进入状态 36
+    LPAREN      偏移，并进入状态 37
+    ADD         偏移，并进入状态 39
+    MINUS       偏移，并进入状态 40
+    NOT         偏移，并进入状态 41
+
+    LVal        转到状态 44
+    PrimaryExp  转到状态 45
+    Number      转到状态 46
+    UnaryExp    转到状态 47
+    UnaryOp     转到状态 48
+    MulExp      转到状态 49
+    AddExp      转到状态 140
+    RelExp      转到状态 165
+
+
+状态 155
+
+   94 LAndExp: LAndExp AND . EqExp
+
+    IDENTIFIER  偏移，并进入状态 35
+    INTEGER     偏移，并进入状态 36
+    LPAREN      偏移，并进入状态 37
+    ADD         偏移，并进入状态 39
+    MINUS       偏移，并进入状态 40
+    NOT         偏移，并进入状态 41
+
+    LVal        转到状态 44
+    PrimaryExp  转到状态 45
+    Number      转到状态 46
+    UnaryExp    转到状态 47
+    UnaryOp     转到状态 48
+    MulExp      转到状态 49
+    AddExp      转到状态 140
+    RelExp      转到状态 141
+    EqExp       转到状态 166
+
+
+状态 156
+
+   96 LOrExp: LOrExp OR . LAndExp
+
+    IDENTIFIER  偏移，并进入状态 35
+    INTEGER     偏移，并进入状态 36
+    LPAREN      偏移，并进入状态 37
+    ADD         偏移，并进入状态 39
+    MINUS       偏移，并进入状态 40
+    NOT         偏移，并进入状态 41
+
+    LVal        转到状态 44
+    PrimaryExp  转到状态 45
+    Number      转到状态 46
+    UnaryExp    转到状态 47
+    UnaryOp     转到状态 48
+    MulExp      转到状态 49
+    AddExp      转到状态 140
+    RelExp      转到状态 141
+    EqExp       转到状态 142
+    LAndExp     转到状态 167
+
+
+状态 157
+
+   57 Stmt: WHILE LPAREN Cond RPAREN . Stmt
+
+    SEMICOLON   偏移，并进入状态 111
+    IDENTIFIER  偏移，并进入状态 35
+    INTEGER     偏移，并进入状态 36
+    IF          偏移，并进入状态 112
+    WHILE       偏移，并进入状态 113
+    BREAK       偏移，并进入状态 114
+    CONTINUE    偏移，并进入状态 115
+    RETURN      偏移，并进入状态 116
+    LPAREN      偏移，并进入状态 37
+    LBRACE      偏移，并进入状态 76
+    ADD         偏移，并进入状态 39
+    MINUS       偏移，并进入状态 40
+    NOT         偏移，并进入状态 41
+
+    Block       转到状态 119
+    Stmt        转到状态 168
+    Exp         转到状态 122
+    LVal        转到状态 123
+    PrimaryExp  转到状态 45
+    Number      转到状态 46
+    UnaryExp    转到状态 47
+    UnaryOp     转到状态 48
+    MulExp      转到状态 49
+    AddExp      转到状态 50
+
+
+状态 158
+
+   51 Stmt: LVal LOP_ASSIGN Exp SEMICOLON .
+
+    $default  使用规则 51 以归约 (Stmt)
+
+
+状态 159
+
+   55 Stmt: IF LPAREN Cond RPAREN Stmt .
+   56     | IF LPAREN Cond RPAREN Stmt . ELSE Stmt
+
+    ELSE  偏移，并进入状态 169
+
+    ELSE      [使用规则 55 以归约 (Stmt)]
+    $default  使用规则 55 以归约 (Stmt)
+
+
+状态 160
+
+   83 AddExp: AddExp . ADD MulExp
+   84       | AddExp . MINUS MulExp
+   86 RelExp: RelExp LS AddExp .
+
+    ADD    偏移，并进入状态 71
+    MINUS  偏移，并进入状态 72
+
+    $default  使用规则 86 以归约 (RelExp)
+
+
+状态 161
+
+   83 AddExp: AddExp . ADD MulExp
+   84       | AddExp . MINUS MulExp
+   87 RelExp: RelExp GT AddExp .
+
+    ADD    偏移，并进入状态 71
+    MINUS  偏移，并进入状态 72
+
+    $default  使用规则 87 以归约 (RelExp)
+
+
+状态 162
+
+   83 AddExp: AddExp . ADD MulExp
+   84       | AddExp . MINUS MulExp
+   88 RelExp: RelExp LE AddExp .
+
+    ADD    偏移，并进入状态 71
+    MINUS  偏移，并进入状态 72
+
+    $default  使用规则 88 以归约 (RelExp)
+
+
+状态 163
+
+   83 AddExp: AddExp . ADD MulExp
+   84       | AddExp . MINUS MulExp
+   89 RelExp: RelExp GE AddExp .
+
+    ADD    偏移，并进入状态 71
+    MINUS  偏移，并进入状态 72
+
+    $default  使用规则 89 以归约 (RelExp)
+
+
+状态 164
+
+   86 RelExp: RelExp . LS AddExp
+   87       | RelExp . GT AddExp
+   88       | RelExp . LE AddExp
+   89       | RelExp . GE AddExp
+   91 EqExp: EqExp EQ RelExp .
+
+    LS  偏移，并进入状态 149
+    GT  偏移，并进入状态 150
+    LE  偏移，并进入状态 151
+    GE  偏移，并进入状态 152
+
+    $default  使用规则 91 以归约 (EqExp)
+
+
+状态 165
+
+   86 RelExp: RelExp . LS AddExp
+   87       | RelExp . GT AddExp
+   88       | RelExp . LE AddExp
+   89       | RelExp . GE AddExp
+   92 EqExp: EqExp NE RelExp .
+
+    LS  偏移，并进入状态 149
+    GT  偏移，并进入状态 150
+    LE  偏移，并进入状态 151
+    GE  偏移，并进入状态 152
+
+    $default  使用规则 92 以归约 (EqExp)
+
+
+状态 166
+
+   91 EqExp: EqExp . EQ RelExp
+   92      | EqExp . NE RelExp
+   94 LAndExp: LAndExp AND EqExp .
+
+    EQ  偏移，并进入状态 153
+    NE  偏移，并进入状态 154
+
+    $default  使用规则 94 以归约 (LAndExp)
+
+
+状态 167
+
+   94 LAndExp: LAndExp . AND EqExp
+   96 LOrExp: LOrExp OR LAndExp .
+
+    AND  偏移，并进入状态 155
+
+    $default  使用规则 96 以归约 (LOrExp)
+
+
+状态 168
+
+   57 Stmt: WHILE LPAREN Cond RPAREN Stmt .
+
+    $default  使用规则 57 以归约 (Stmt)
+
+
+状态 169
+
+   56 Stmt: IF LPAREN Cond RPAREN Stmt ELSE . Stmt
+
+    SEMICOLON   偏移，并进入状态 111
+    IDENTIFIER  偏移，并进入状态 35
+    INTEGER     偏移，并进入状态 36
+    IF          偏移，并进入状态 112
+    WHILE       偏移，并进入状态 113
+    BREAK       偏移，并进入状态 114
+    CONTINUE    偏移，并进入状态 115
+    RETURN      偏移，并进入状态 116
+    LPAREN      偏移，并进入状态 37
+    LBRACE      偏移，并进入状态 76
+    ADD         偏移，并进入状态 39
+    MINUS       偏移，并进入状态 40
+    NOT         偏移，并进入状态 41
+
+    Block       转到状态 119
+    Stmt        转到状态 170
+    Exp         转到状态 122
+    LVal        转到状态 123
+    PrimaryExp  转到状态 45
+    Number      转到状态 46
+    UnaryExp    转到状态 47
+    UnaryOp     转到状态 48
+    MulExp      转到状态 49
+    AddExp      转到状态 50
+
+
+状态 170
+
+   56 Stmt: IF LPAREN Cond RPAREN Stmt ELSE Stmt .
+
+    $default  使用规则 56 以归约 (Stmt)

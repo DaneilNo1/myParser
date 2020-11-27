@@ -6,18 +6,33 @@
     int yylex();
     int yyerror( char const * );
 %}
-%token T_CHAR T_INT T_STRING T_BOOL 
 
-%token LOP_ASSIGN
+%token T_CHAR T_INT T_STRING T_BOOL T_VOID
 
-%token SEMICOLON
+%token LOP_ASSIGN LOP_ADDTO LOP_MINTO LOP_MULTO LOP_DIVTO
 
-%token IDENTIFIER INTEGER CHAR BOOL STRING VOID
+%token IDENTIFIER INTEGER CHAR BOOL STRING VOID CONST
+
+%token IF ELSE FOR WHILE BREAK CONTINUE RETURN
+
+%token TRUE FALSE
+
+%token ADD MINUS MUL DIV MOD
+
+%token NOT AND OR
+
+%token BITAND BITOR BITNOT SHL SHR
+
+%token LS GT EQ LE GE NE
+
+%token COMMA
+
+
 
 %left LOP_EQ
 
-%%
 
+%%
 
 CompUnit
 : Decl 
@@ -26,15 +41,13 @@ CompUnit
 | CompUnit FuncDef
 ;
 
-
-
 Decl
 : ConstDecl
 | VarDecl
 ;
 
 ConstDecl
-: CONST BType ConstDefs SEMICOLON
+: CONST BType ConstDefs ';'
 ;
 
 BType
@@ -117,6 +130,7 @@ FuncFParams
 
 FuncFParam
 : BType IDENTIFIER
+| BType IDENTIFIER MultipuleIndexs
 ;
 
 MultipuleIndexs
@@ -176,15 +190,13 @@ PrimaryExp
 ;
 
 Number
-: DEC_CONST
-| OCT_CONST
-| HEX_CONST
+: INTEGER
 ;
 
 UnaryExp
 : PrimaryExp 
 | IDENTIFIER LPAREN RPAREN
-| IDENTIFIER LPAREN FuncFParams RPAREN
+| IDENTIFIER LPAREN FuncRParams RPAREN
 | UnaryOp UnaryExp
 ;
 
@@ -196,7 +208,7 @@ UnaryOp
 
 FuncRParams
 : Exp
-| FuncFParams COMMA Exp
+| FuncRParams COMMA Exp
 ;
 
 MulExp
@@ -239,103 +251,6 @@ LOrExp
 ConstExp
 : AddExp
 ;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-program
-: statements {root = new TreeNode(0, NODE_PROG); root->addChild($1);};
-
-statements
-:  statement {$$=$1;}
-|  statements statement {$$=$1; $$->addSibling($2);}
-;
-
-statement
-: SEMICOLON  {$$ = new TreeNode(lineno, NODE_STMT); $$->stype = STMT_SKIP;}
-| declaration SEMICOLON {$$ = $1;}
-;
-
-declaration
-: T IDENTIFIER LOP_ASSIGN expr{  // declare and init
-    TreeNode* node = new TreeNode($1->lineno, NODE_STMT);
-    node->stype = STMT_DECL;
-    node->addChild($1);
-    node->addChild($2);
-    node->addChild($4);
-    $$ = node;
-} 
-| T IDENTIFIER {
-    TreeNode* node = new TreeNode($1->lineno, NODE_STMT);
-    node->stype = STMT_DECL;
-    node->addChild($1);
-    node->addChild($2);
-    $$ = node;
-}
-;
-
-expr
-: IDENTIFIER {
-    $$ = $1;
-}
-| INTEGER {
-    $$ = $1;
-}
-| CHAR {
-    $$ = $1;
-}
-| STRING {
-    $$ = $1;
-}
-;
-
-T: T_INT {$$ = new TreeNode(lineno, NODE_TYPE); $$->type = TYPE_INT;}
-| T_CHAR {$$ = new TreeNode(lineno, NODE_TYPE); $$->type = TYPE_CHAR;}
-| T_BOOL {$$ = new TreeNode(lineno, NODE_TYPE); $$->type = TYPE_BOOL;}
-;
-
 
 
 %%

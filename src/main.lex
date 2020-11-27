@@ -11,6 +11,7 @@ LINECOMMENT \/\/[^\n]*
 EOL	(\r\n|\r|\n)
 WHILTESPACE [[:blank:]]
 
+
 DEC_CONST   [1-9][0-9]*
 OCT_CONST   0[0-7]*
 HEX_CONST   (0X|0x)[0-9a-fA-F]*
@@ -29,6 +30,7 @@ IDENTIFIER [[:alpha:]_][[:alpha:][:digit:]_]*
 "bool" return T_BOOL;
 "char" return T_CHAR;
 "void"  return T_VOID;
+"string" return T_STRING;
 
 "if"	return IF;
 "else"	return ELSE;
@@ -49,15 +51,6 @@ IDENTIFIER [[:alpha:]_][[:alpha:][:digit:]_]*
 "-="    return LOP_MINTO;
 "*="    return LOP_MULTO;
 "/="    return LOP_DIVTO;
-
-";" return  SEMICOLON;
-
-"(" return LPAREN;
-")" return RPAREN;
-"{" return LBRACE;
-"}" return RBRACE;
-"[" return LS_LBRA;
-"]" return LS_RBRA;
 
 "+" return ADD;
 "-" return MINUS;
@@ -90,7 +83,7 @@ IDENTIFIER [[:alpha:]_][[:alpha:][:digit:]_]*
     node->type = TYPE_INT;
     node->int_val = atoi(yytext);
     yylval = node;
-    return DEC_CONST;
+    return INTEGER;
 }
 
 {OCT_CONST} {
@@ -98,7 +91,7 @@ IDENTIFIER [[:alpha:]_][[:alpha:][:digit:]_]*
     node->type = TYPE_INT;
     node->int_val = otod(yytext);
     yylval = node;
-    return OCT_CONST;
+    return INTEGER;
 }
 
 {HEX_CONST} {
@@ -106,7 +99,7 @@ IDENTIFIER [[:alpha:]_][[:alpha:][:digit:]_]*
     node->type = TYPE_INT;
     node->int_val = htod(yytext);
     yylval = node;
-    return HEX_CONST;
+    return INTEGER;
 }
 
 {CHAR} {
