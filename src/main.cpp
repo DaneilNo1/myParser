@@ -18,6 +18,7 @@ int main(int argc, char *argv[])
         else
         {
             cerr << "failed to open file: " << argv[1] << endl;
+            return -1;
         }
     }
     yyparse();

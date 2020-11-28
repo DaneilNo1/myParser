@@ -1,0 +1,15 @@
+INTEGER
+VarDecl
+INTEGER
+VarDecl
+INTEGER
+VarDecl
+INTEGER
+INTEGER
+LOrExp
+INTEGER
+VarDecl
+INTEGER
+if
+LOrExp
+while

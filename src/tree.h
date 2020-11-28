@@ -4,8 +4,6 @@
 #include "pch.h"
 #include "type.h"
 
-#define MAXCHILDREN 5
-
 enum NodeType
 {
     NODE_CONST, 

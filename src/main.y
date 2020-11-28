@@ -9,6 +9,8 @@
 
 %token T_CHAR T_INT T_STRING T_BOOL T_VOID
 
+%token SEMICOLON
+
 %token LOP_ASSIGN LOP_ADDTO LOP_MINTO LOP_MULTO LOP_DIVTO
 
 %token IDENTIFIER INTEGER CHAR BOOL STRING VOID CONST
@@ -27,7 +29,7 @@
 
 %token COMMA
 
-
+%token LBRACE RBRACE LPAREN RPAREN
 
 %left LOP_EQ
 
@@ -35,19 +37,19 @@
 %%
 
 CompUnit
-: Decl 
-| FuncDef
-| CompUnit Decl
+: Decl {$$->addChild($1);}
+| FuncDef {$$->addChild($1);}
+| CompUnit Decl 
 | CompUnit FuncDef
 ;
 
 Decl
-: ConstDecl
-| VarDecl
+: ConstDecl {cout<<"ConstDecl"<<endl;}
+| VarDecl {cout<<"VarDecl"<<endl;}
 ;
 
 ConstDecl
-: CONST BType ConstDefs ';'
+: CONST BType ConstDefs SEMICOLON
 ;
 
 BType
@@ -62,16 +64,17 @@ ConstDefs
 ;
 
 ConstDef
-: IDENTIFIER ArrayIndexs LOP_ASSIGN ConstInitVal
+: IDENTIFIER LOP_ASSIGN ConstInitVal
+| IDENTIFIER ArrayIndexs LOP_ASSIGN ConstInitVal
 ;
 
 ArrayIndexs
-: ArrayIndexs ArrayIndex
-|
+: ArrayIndex
+| ArrayIndexs ArrayIndex
 ;
 
 ArrayIndex
-: LS_LBRA ConstExp LS_RBRA
+: '[' ConstExp ']'
 ;
 
 ConstInitVals
@@ -91,13 +94,15 @@ VarDecl
 ;
 
 VarDefs
-: VarDef ArrayIndexs
-| VarDefs ArrayIndexs COMMA VarDef
+: VarDef
+| VarDefs COMMA VarDef
 ;
 
 VarDef
 : IDENTIFIER
+| IDENTIFIER ArrayIndexs
 | IDENTIFIER LOP_ASSIGN InitVal
+| IDENTIFIER ArrayIndexs LOP_ASSIGN InitVal
 ;
 
 InitVals
@@ -106,21 +111,16 @@ InitVals
 ;
 
 InitVal
-: Exp
+: ConstExp
 | LBRACE RBRACE
 | LBRACE InitVals RBRACE
 ;
 
 FuncDef
-: FuncType IDENTIFIER LPAREN RPAREN Block
-| FuncType IDENTIFIER LPAREN FuncFParams RPAREN Block
-;
-
-FuncType
-: T_INT
-| T_CHAR
-| T_STRING
-| T_VOID
+: BType IDENTIFIER LPAREN RPAREN Block
+| T_VOID IDENTIFIER LPAREN RPAREN Block
+| BType IDENTIFIER LPAREN FuncFParams RPAREN Block
+| T_VOID IDENTIFIER LPAREN FuncFParams RPAREN Block
 ;
 
 FuncFParams
@@ -130,26 +130,18 @@ FuncFParams
 
 FuncFParam
 : BType IDENTIFIER
-| BType IDENTIFIER MultipuleIndexs
-;
-
-MultipuleIndexs
-: LS_LBRA LS_RBRA
-| LS_LBRA LS_RBRA DynamicIndex
-;
-
-DynamicIndex
-: LS_LBRA Exp LS_RBRA
-| DynamicIndex LS_LBRA Exp LS_RBRA
+| BType IDENTIFIER '[' ']'
+| BType IDENTIFIER '[' ']' ArrayIndexs
 ;
 
 Block
 : LBRACE BlockItems RBRACE
+| LBRACE RBRACE
 ;
 
 BlockItems
-: BlockItems BlockItem
-|
+: BlockItem
+| BlockItems BlockItem
 ;
 
 BlockItem
@@ -158,39 +150,36 @@ BlockItem
 ;
 
 Stmt
-: LVal LOP_ASSIGN Exp SEMICOLON
+: LVal LOP_ASSIGN ConstExp SEMICOLON
 | SEMICOLON
-| Exp SEMICOLON
+| ConstExp SEMICOLON
 | Block
-| IF LPAREN Cond RPAREN Stmt
+| IF LPAREN Cond RPAREN Stmt {cout<<"if"<<endl;}
 | IF LPAREN Cond RPAREN Stmt ELSE Stmt
-| WHILE LPAREN Cond RPAREN Stmt
+| WHILE LPAREN Cond RPAREN Stmt {cout<<"while"<<endl;}
 | BREAK SEMICOLON
 | CONTINUE SEMICOLON
 | RETURN SEMICOLON
-| RETURN Exp SEMICOLON
-;
-
-Exp
-: AddExp
+| RETURN ConstExp SEMICOLON
 ;
 
 Cond
-: LOrExp
+: LOrExp {cout<<"LOrExp"<<endl;}
 ;
 
 LVal
-: IDENTIFIER DynamicIndex
+: IDENTIFIER
+| IDENTIFIER ArrayIndexs
 ;
 
 PrimaryExp
-: LPAREN Exp RPAREN
+: LPAREN ConstExp RPAREN
 | LVal
 | Number
 ;
 
 Number
-: INTEGER
+: INTEGER {cout<<"INTEGER"<<endl;}
 ;
 
 UnaryExp
@@ -207,8 +196,8 @@ UnaryOp
 ;
 
 FuncRParams
-: Exp
-| FuncRParams COMMA Exp
+: ConstExp
+| FuncRParams COMMA ConstExp
 ;
 
 MulExp

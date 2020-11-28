@@ -1,16 +1,25 @@
 #include "tree.h"
 using namespace std;
 void TreeNode::addChild(TreeNode* child) {
-	this->child = child;
+    if(this->child == nullptr){
+        this->child = child;
+    }else{
+        this->child->addSibling(child);
+    }
+	
 }
 
 void TreeNode::addSibling(TreeNode* sibling){
-	this->sibling = sibling;
+    TreeNode *cursor=this;
+    while(cursor->sibling != nullptr){
+        cursor = cursor->sibling;
+    }
+	cursor->sibling = sibling;
 }
 
 TreeNode::TreeNode(int lineno, NodeType type) {
-	this->lineo = lineno;
-	this->NodeType = type;
+	this->lineno = lineno;
+	this->nodeType = type;
 }
 
 void TreeNode::genNodeId() {

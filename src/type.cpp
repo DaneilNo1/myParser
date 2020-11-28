@@ -6,8 +6,6 @@ Type::Type(ValueType valueType) {
 
 string Type::getTypeInfo() {
     switch(this->type) {
-        case VALUE_VOID:
-            return 'void';
         case VALUE_BOOL:
             return "bool";
         case VALUE_INT:
@@ -22,16 +20,3 @@ string Type::getTypeInfo() {
     }
     return "?";
 }
-
-void Type::addChild(Type *t){
-    
-}
-
-void Type::addParam(Type *t){
-
-}
-
-void Type::addRet(Type *t){
-
-}
-

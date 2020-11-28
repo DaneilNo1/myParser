@@ -45,6 +45,7 @@ IDENTIFIER [[:alpha:]_][[:alpha:][:digit:]_]*
 "true"  return TRUE;
 "false" return FALSE;
 
+";"     return SEMICOLON;
 
 "=" return LOP_ASSIGN;
 "+="    return LOP_ADDTO;
@@ -77,6 +78,10 @@ IDENTIFIER [[:alpha:]_][[:alpha:][:digit:]_]*
 
 "," return COMMA;
 
+"{" return LBRACE;
+"}" return RBRACE;
+"(" return LPAREN;
+")" return RPAREN;
 
 {DEC_CONST} {
     TreeNode* node = new TreeNode(lineno, NODE_CONST);
@@ -140,12 +145,18 @@ int htod(string hex){
     for(int i = 2; i < hex.length();i++){
         res *= 16;
         switch (hex[i]){
-            case 'a'||'A': res += 10;break;
-            case 'b'||'B': res += 11;break;
-            case 'c'||'C': res += 12;break;
-            case 'd'||'D': res += 13;break;
-            case 'e'||'E': res += 14;break;
-            case 'f'||'F': res += 15;break;
+            case 'a':
+            case 'A': res += 10;break;
+            case 'b':
+            case 'B': res += 11;break;
+            case 'c':
+            case 'C': res += 12;break;
+            case 'd':
+            case 'D': res += 13;break;
+            case 'e':
+            case 'E': res += 14;break;
+            case 'f':
+            case 'F': res += 15;break;
             default: res += hex[i] - '0';
         }
     }
